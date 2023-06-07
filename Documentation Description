@@ -1,0 +1,85 @@
+Documentation describing the indexing strategy, including the selected columns and their impact on query performance.
+
+Indexing Strategy Documentation:
+Table: books 
+Columns selected for indexing:
+book_id (Primary Key)
+isbn (Unique)
+The book_id column is the primary key of the books table, automatically creating a clustered index. This index ensures fast retrieval of individual records based on their unique book_id values.
+The isbn column is marked as unique and has a non-clustered index. This index allows efficient lookup and retrieval of books based on their ISBN numbers, improving the performance of queries that involve searching or filtering by ISBN.
+Table: users 
+Columns selected for indexing:
+user_id (Primary Key)
+email (Unique)
+The user_id column is the primary key of the users table, resulting in a clustered index. This index facilitates quick retrieval of user records based on their unique user_id values.
+The email column is marked as unique and has a non-clustered index. This index enables efficient search and retrieval of user records based on their email addresses, enhancing the performance of queries involving email-based lookups or filters.
+Table: authors 
+Columns selected for indexing:
+author_id (Primary Key)
+The author_id column is the primary key of the authors table, resulting in a clustered index. This index ensures rapid retrieval of author records based on their unique author_id values.
+Table: copies 
+Columns selected for indexing:
+copy_id (Primary Key)
+book_id
+The copy_id column is the primary key of the copies table, resulting in a clustered index. This index facilitates fast retrieval of copy records based on their unique copy_id values.
+The book_id column is indexed as a foreign key, creating a non-clustered index. This index improves the performance of queries involving join operations or filtering based on book IDs.
+Table: loans 
+Columns selected for indexing:
+loan_id (Primary Key)
+user_id
+copy_id
+The loan_id column is the primary key of the loans table, resulting in a clustered index. This index facilitates fast retrieval of loan records based on their unique loan_id values.
+The user_id and copy_id columns are indexed as foreign keys, creating non-clustered indexes. These indexes improve the performance of queries involving join operations or filtering based on user or copy IDs.
+Table: fines 
+Columns selected for indexing:
+fine_id (Primary Key)
+loan_id
+The fine_id column is the primary key of the fines table, resulting in a clustered index. This index allows rapid retrieval of fine records based on their unique fine_id values.
+The loan_id column is indexed as a foreign key, creating a non-clustered index. This index improves the performance of queries involving join operations or filtering based on loan IDs.
+Table: book_reviews 
+Columns selected for indexing:
+review_id (Primary Key)
+book_id
+user_id
+The review_id column is the primary key of the book_reviews table, resulting in a clustered index. This index facilitates fast retrieval of review records based on their unique review_id values.
+The book_id and user_id columns are indexed as foreign keys, creating non-clustered indexes. These indexes enhance the performance of queries involving join operations or filtering based on book or user IDs.
+Table: book_author_link 
+Columns selected for indexing:
+book_id
+author_id (Part of Primary Key)
+The book_id and author_id columns together form the primary key of the book_author_link table, creating a clustered index. This index ensures efficient retrieval of book-author link records based on their unique book_id and author_id combinations.
+This indexing strategy aims to optimize the performance of common query operations, such as searching, filtering, and joining, by leveraging indexes on relevant columns.
+
+ Documentation describing the transaction design, scenarios tested, and the observed behavior of transactions.
+Transaction Design Documentation:
+Loan Book Transaction: 
+Scenario: A user borrows a book from the library. 
+Steps:
+Check if the book is available for loan by verifying the "available" field in the "copies" table.
+If the book is available, update the "copies" table to mark the copy as unavailable.
+Create a new loan record in the "loans" table for the user and book. 
+Expected Behavior: 
+The transaction should ensure the atomic update of the "copies" table's availability status and the creation of a new loan record in the "loans" table.
+If any step fails, the transaction should be rolled back to maintain data integrity and revert any changes made.
+Return Book Transaction: 
+Scenario: A user returns a borrowed book to the library. 
+Steps:
+Update the "copies" table to mark the copy as available.
+Update the corresponding loan record in the "loans" table with the return date. 
+Expected Behavior: 
+The transaction should update the "copies" table's availability status and the loan record in the "loans" table atomically. 
+If any step fails, the transaction should be rolled back to maintain data integrity and revert any changes made.
+Pay Fine Transaction: 
+Scenario: A user pays a fine for a late book return. 
+Steps:
+Update the "fines" table with the payment amount and date.
+Update the corresponding loan record in the "loans" table with the payment status. 
+Expected Behavior: 
+The transaction should update the "fines" table with the payment details and the loan record in the "loans" table with the payment status atomically. 
+If any step fails, the transaction should be rolled back to maintain data integrity and revert any changes made.
+Observed Behavior of Transactions:
+Atomicity: All transactions exhibited atomicity, ensuring that either all the steps within a transaction were executed successfully, or none of them were. If any step within a transaction failed, the changes made by previous steps were rolled back, preserving data consistency. This included updates to the "copies" table for availability status and loan-related tables for loan and return transactions.
+Isolation: Transactions maintained isolation between concurrent operations, preventing interference and maintaining data integrity. Concurrent transactions accessing the "copies" table or loan-related tables did not affect each other's intermediate states.
+Consistency: Transactions enforced data integrity rules and constraints. If any operation violated the defined constraints or left the database in an inconsistent state, the transaction was rolled back to restore consistency. This included reverting changes to the "copies" table for availability status and loan-related tables for loan and return transactions.
+Durability: Committed transactions ensured that their changes were permanently stored in the database, even in the event of system failures or restarts. This provided durability and prevented data loss. This included updates to the "copies" table for availability status and loan-related tables for loan and return transactions.
+The observed behavior confirmed that the transaction design effectively provided the required guarantees of atomicity, isolation, consistency, and durability. Transactions maintained data integrity and reliability in various scenarios, ensuring the correctness and consistency of the database operations.
