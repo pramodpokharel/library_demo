@@ -1,5 +1,6 @@
 # library_demo
-Library Management System Design
+Library Management System Design:
+
 Data Modelling:
 1.    Identify the entities involved in the Library Management System, such as users, books, different copies of a book, authors, loans, fines, book reviews, etc, … Teams should make analysis and observation from similar systems and come up with their own designs.
 2.  Define the attributes for each entity, ensuring that the data model captures all necessary information.
